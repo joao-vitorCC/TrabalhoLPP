@@ -1,17 +1,18 @@
 package Tokens;
 
 public class Lhs {
-    private String name;
+    private String varName;
 
-    public Lhs(String name) {
-        this.name = name;
+    public Lhs(String varName) {
+        this.varName = varName;
     }
 
-    public String getName() {
-        return name;
+    public String getVarName() {
+        return varName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setVarName(String varName) {
+        this.varName = varName;
     }
+
 }
