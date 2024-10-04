@@ -1,5 +1,7 @@
 package Model;
 
+import Tokens.Atribuicao;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -31,7 +33,11 @@ public class Run {
             linha = lerArq.readLine();
             if(linha != null){
                 if(isAtrr(linha)){
+                    Atribuicao at;
+                    at = Processing.processAtrr(linha);
+                    Processing.saveAtrr("ArquivoSaida",at);
                     System.out.println("e atribuicao");
+
                 }
             }
 
@@ -44,7 +50,6 @@ public class Run {
     public static boolean isAtrr(String text){
         String patternAtribuicao = "\\s*[A-Za-z]+\\s*=\\s*[0-9]+\\s*";
         Pattern pattern = Pattern.compile(patternAtribuicao);
-        //Matcher matcher = pattern.matcher("TEste");
         System.out.println(Pattern.matches(patternAtribuicao,text));
         boolean b = Pattern.matches(patternAtribuicao,text);
         return b;
