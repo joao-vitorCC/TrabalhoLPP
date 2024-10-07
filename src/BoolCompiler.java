@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
@@ -26,6 +27,7 @@ public class  BoolCompiler{
         }
         FileReader arq = Model.Run.openFile(ArquivoEntrada,ArquivoSaida);
         Model.Run.readFile(arq);
+        File arqSaida = Model.Run.createFile(ArquivoSaida);
         /*  try {
             FileReader arq = new FileReader(ArquivoEntrada);
             BufferedReader lerArq = new BufferedReader(arq);

@@ -3,6 +3,7 @@ package Model;
 import Tokens.Atribuicao;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.regex.Matcher;
@@ -32,7 +33,7 @@ public class Run {
         while(linha != null){
             linha = lerArq.readLine();
             if(linha != null){
-                if(isAtrr(linha)){
+                if(Processing.isAtrr(linha)){
                     Atribuicao at;
                     at = Processing.processAtrr(linha);
                     Processing.saveAtrr("ArquivoSaida",at);
@@ -47,11 +48,19 @@ public class Run {
         arq.close();
 
     }
-    public static boolean isAtrr(String text){
-        String patternAtribuicao = "\\s*[A-Za-z]+\\s*=\\s*[0-9]+\\s*";
-        Pattern pattern = Pattern.compile(patternAtribuicao);
-        System.out.println(Pattern.matches(patternAtribuicao,text));
-        boolean b = Pattern.matches(patternAtribuicao,text);
-        return b;
+
+    public static File createFile(String arquivoSaida){
+        try {
+            String DirectoryPath = System.getProperty("user.dir") + "/" + arquivoSaida;
+            File arq = new File(DirectoryPath);
+            arq.createNewFile();
+            System.out.print("Arquivo criado com sucesso!");
+            return arq;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
+
 }
