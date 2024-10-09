@@ -26,7 +26,7 @@ public class Run {
         return null;
     }
 
-    public static void readFile(FileReader arq) throws IOException {
+    public static void readFile(FileReader arq,String ArquivoSaida) throws IOException {
         BufferedReader lerArq = new BufferedReader(arq);
         String linha = "";
 
@@ -36,7 +36,7 @@ public class Run {
                 if(Processing.isAtrr(linha)){
                     Atribuicao at;
                     at = Processing.processAtrr(linha);
-                    Processing.saveAtrr("ArquivoSaida",at);
+                    Processing.saveAtrr(ArquivoSaida,at);
                     System.out.println("e atribuicao");
 
                 }

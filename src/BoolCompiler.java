@@ -26,8 +26,9 @@ public class  BoolCompiler{
             ArquivoSaida = sc.nextLine();
         }
         FileReader arq = Model.Run.openFile(ArquivoEntrada,ArquivoSaida);
-        Model.Run.readFile(arq);
         File arqSaida = Model.Run.createFile(ArquivoSaida);
+        Model.Run.readFile(arq,ArquivoSaida);
+
         /*  try {
             FileReader arq = new FileReader(ArquivoEntrada);
             BufferedReader lerArq = new BufferedReader(arq);
