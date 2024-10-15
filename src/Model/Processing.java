@@ -26,13 +26,11 @@ public class Processing {
         return at;
     }
 
-    public static void saveAtrr(String arqSaida, Atribuicao at) throws IOException {
+    public static void saveAtrr( BufferedWriter arq , Atribuicao at) throws IOException {
         System.out.println("Gravar no arquivo de saida as instrucoes de atribuicao");
-        BufferedWriter arq = new BufferedWriter(new FileWriter(arqSaida));
         arq.write("const " + at.getArg().getNum() + "\n" + "store " + at.getLhs().getVarName());
+        arq.newLine();
         System.out.println("gravado");
-        arq.close();
-
     }
 
     public static boolean isAtrr(String text){

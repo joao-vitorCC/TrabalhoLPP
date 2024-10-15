@@ -9,13 +9,10 @@ public class  BoolCompiler{
     //Teste
     public static void main(String[] args) throws IOException {
         Scanner sc = new Scanner(System.in);
-        String ArquivoEntrada;
-        String ArquivoSaida;
+        String ArquivoEntrada = "Teste.bool";
+        String ArquivoSaida = "b.boolc";
 
-
-
-
-        if(args.length == 2){
+        /*if(args.length == 2){
             ArquivoEntrada = args[0];
 
             ArquivoSaida = args[1];
@@ -24,8 +21,8 @@ public class  BoolCompiler{
             ArquivoEntrada = sc.nextLine();
             System.out.println("Escreva o nome do arquivo de saida");
             ArquivoSaida = sc.nextLine();
-        }
-        FileReader arq = Model.Run.openFile(ArquivoEntrada,ArquivoSaida);
+        }*/
+        FileReader arq = Model.Run.openFile(ArquivoEntrada);
         File arqSaida = Model.Run.createFile(ArquivoSaida);
         Model.Run.readFile(arq,ArquivoSaida);
 

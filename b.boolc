@@ -1,2 +1,4 @@
-const 22
-store test
+const 0
+store x
+const 1024
+store x

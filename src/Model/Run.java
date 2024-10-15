@@ -2,16 +2,11 @@ package Model;
 
 import Tokens.Atribuicao;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.io.*;
 
 public class Run {
 
-    public static  FileReader openFile(String  ArquivoEntrada,String ArquivoSaida){
+    public static  FileReader openFile(String  ArquivoEntrada){
         try {
             String DirectoryPath = System.getProperty("user.dir") + "/" + ArquivoEntrada;
             FileReader arq = new FileReader(DirectoryPath);
@@ -28,6 +23,8 @@ public class Run {
 
     public static void readFile(FileReader arq,String ArquivoSaida) throws IOException {
         BufferedReader lerArq = new BufferedReader(arq);
+        FileWriter saida =  new FileWriter(ArquivoSaida);
+        BufferedWriter arqS = new BufferedWriter(saida);
         String linha = "";
 
         while(linha != null){
@@ -36,15 +33,13 @@ public class Run {
                 if(Processing.isAtrr(linha)){
                     Atribuicao at;
                     at = Processing.processAtrr(linha);
-                    Processing.saveAtrr(ArquivoSaida,at);
+                    Processing.saveAtrr(arqS,at);
                     System.out.println("e atribuicao");
-
                 }
             }
-
             System.out.println(linha);
         }
-
+        arqS.close();
         arq.close();
 
     }
