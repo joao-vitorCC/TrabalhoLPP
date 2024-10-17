@@ -1,12 +1,14 @@
 package Model;
 
-import Tokens.Atribuicao;
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Run {
 
-    public static  FileReader openFile(String  ArquivoEntrada){
+    public static  FileReader openFile(String  ArquivoEntrada,String ArquivoSaida){
         try {
             String DirectoryPath = System.getProperty("user.dir") + "/" + ArquivoEntrada;
             FileReader arq = new FileReader(DirectoryPath);
@@ -21,41 +23,32 @@ public class Run {
         return null;
     }
 
-    public static void readFile(FileReader arq,String ArquivoSaida) throws IOException {
+    public static void readFile(FileReader arq) throws IOException {
         BufferedReader lerArq = new BufferedReader(arq);
-        FileWriter saida =  new FileWriter(ArquivoSaida);
-        BufferedWriter arqS = new BufferedWriter(saida);
         String linha = "";
 
-        while(linha != null){
+        while(true){
             linha = lerArq.readLine();
             if(linha != null){
-                if(Processing.isAtrr(linha)){
-                    Atribuicao at;
-                    at = Processing.processAtrr(linha);
-                    Processing.saveAtrr(arqS,at);
+                if(isAtrr(linha)){
                     System.out.println("e atribuicao");
                 }
+            }else{
+                break;
             }
+
             System.out.println(linha);
         }
-        arqS.close();
+
         arq.close();
 
     }
-
-    public static File createFile(String arquivoSaida){
-        try {
-            String DirectoryPath = System.getProperty("user.dir") + "/" + arquivoSaida;
-            File arq = new File(DirectoryPath);
-            arq.createNewFile();
-            System.out.print("Arquivo criado com sucesso!");
-            return arq;
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public static boolean isAtrr(String text){
+        String patternAtribuicao = "\\s*[A-Za-z]+\\s*=\\s*[0-9]+\\s*";
+        Pattern pattern = Pattern.compile(patternAtribuicao);
+        //Matcher matcher = pattern.matcher("TEste");
+        System.out.println(Pattern.matches(patternAtribuicao,text));
+        boolean b = Pattern.matches(patternAtribuicao,text);
+        return b;
     }
-
 }
