@@ -1,5 +1,7 @@
 package Patterns;
 
+import HashMap.HashMapClassMethod;
+import HashMap.HashMapClassVar;
 import Tokens.Reserved;
 import HashMap.HashMapVar;
 
@@ -10,11 +12,12 @@ import java.util.regex.Pattern;
 public class PatternNome {
     String patternNome;//"\\s*[a-zA-Z]+\\s[a-zA-Z]+"
     Reserved reserved = new Reserved();
-    private HashMapVar hashMapVar = new HashMapVar();
-
+    private HashMapClassVar hashMapClassVar = new HashMapClassVar();
+    private  HashMapClassMethod hashMapClassMethod = new HashMapClassMethod();
     List<String> palavrasReservadas = reserved.getwordList();
-    public PatternNome(HashMapVar hashMapVar) {
-        this.hashMapVar = hashMapVar;
+    public PatternNome(HashMapClassVar hashMapClassVar, HashMapClassMethod hashMapClassMethod) {
+        this.hashMapClassVar = hashMapClassVar;
+        this.hashMapClassMethod = hashMapClassMethod;
 
         StringBuilder stringBuilder = new StringBuilder();
         for (String word : palavrasReservadas) {
@@ -28,7 +31,7 @@ public class PatternNome {
 
     }
 
-    public boolean IsValidVar(String conteudo){
+    public boolean IsValidVar(String conteudo, Integer verificador, String nomeMetodo){
         Pattern pattern = Pattern.compile(patternNome);
         Matcher matcher = pattern.matcher(conteudo);
 
@@ -36,10 +39,13 @@ public class PatternNome {
             String tipo = matcher.group(1);
             String variaveis = matcher.group(2);
             String[] listaDeVariaveis = variaveis.split("\\s*,\\s*");
-
-            for (String variavel : listaDeVariaveis) {
-                if (!hashMapVar.getVariaveisDeclaradas().containsKey(variavel)) {
-                    hashMapVar.getVariaveisDeclaradas().put(variavel, 0);
+            if(verificador == 0) {
+                for (String variavel : listaDeVariaveis) {
+                    hashMapClassVar.adicionaValor(hashMapClassVar.classeAtual, variavel, 0);
+                }
+            }else if(verificador == 1){
+                for (String variavel : listaDeVariaveis) {
+                    hashMapClassMethod.adicionaValor(hashMapClassMethod.classeAtual, nomeMetodo ,variavel, 0);
                 }
             }
             return true;

@@ -29,6 +29,8 @@ public class PatternPrototype {
         if(matcher.matches()){
             String v1 = matcher.group(1);
             String v2 = matcher.group(2);
+            System.out.println("Variavel 1: " + v1);
+            System.out.println("Variavel 2: " + v2);
         }
         return matcher.matches();
     }

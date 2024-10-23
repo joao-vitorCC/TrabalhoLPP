@@ -40,4 +40,13 @@ begin
     x =1024
     p.showid()
     p.calc(x)
+
+    vars a, d, c
+    a = 1024
+    d = 128
+    if a eq d then
+    c = d + a
+    else
+    c = 123
+    end-if
 end
