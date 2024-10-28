@@ -11,6 +11,11 @@ public class ArgVar {
         return var;
     }
 
+    @Override
+    public String toString() {
+        return  var;
+    }
+
     public void setVar(String var) {
         this.var = var;
     }

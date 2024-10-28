@@ -36,6 +36,62 @@ public class Run {
                     Processing.saveAtrr(arqS,at);
                     System.out.println("e atribuicao");
                 }
+                else if(Processing.isAtrrvarvar(linha)){
+                    Atribuicao at;
+                    at = Processing.processAtrrVarVar(linha);
+                    Processing.saveAtrrvarvar(arqS,at);
+                    System.out.println("e atribuicao var var");
+                }
+                else if(Processing.isAtrrObjVar(linha)){
+                    Atribuicao at;
+                    at = Processing.processAtrrObjVar(linha);
+                    Processing.saveAtrrObjVar(arqS,at);
+                    System.out.println("e atribuicao Obj var");
+                }
+                else if(Processing.isAtrrObjConst(linha)){
+                    Atribuicao at;
+                    at = Processing.processAtrrObjConst(linha);
+                    Processing.saveAtrrObjConst(arqS,at);
+                    System.out.println("e atribuicao Obj Const");
+                }
+                else if(Processing.isAtrrVarObj(linha)){
+                    Atribuicao at;
+                    at = Processing.processAtrrVarObj(linha);
+                    Processing.saveAtrrVarObj(arqS,at);
+                    System.out.println("e atribuicao var obj");
+                }
+
+                else if(Processing.isAtrrVarMethod(linha)){
+                    //System.out.println("metodo");
+                    Atribuicao at;
+                    at = Processing.processAtrrVarMethod(linha);
+                    Processing.saveAtrrVarMethod(arqS,at);
+                    System.out.println("e atribuicao var obj");
+                }
+                else if(Processing.isDeclClass(linha)){
+                  Processing.saveDeclClass(arqS,linha);
+                }
+                else if(Processing.isDeclVar(linha)){
+                    Processing.saveDeclVar(arqS,linha);
+                }
+                else if(Processing.isDeclMethod(linha)){
+                    Processing.saveDeclMethod(arqS,linha);
+                }
+                else if(Processing.isEndMethod(linha)){
+                    Processing.saveEndMethod(arqS,linha);
+                }
+                else if(Processing.isBegin(linha)){
+                    Processing.saveBegin(arqS,linha);
+                }
+                else if(Processing.isEndClass(linha)){
+                    Processing.saveEndClass(arqS,linha);
+                }
+                else if(Processing.isMain(linha)){
+                    Processing.saveMain(arqS,linha);
+                }
+                else if(Processing.isEnd(linha)){
+                    Processing.saveEnd(arqS,linha);
+                }
             }
             System.out.println(linha);
         }

@@ -2,9 +2,11 @@ package Tokens;
 
 public class ArgObj {
     private String obj;
+    private String prop;
 
-    public ArgObj(String obj) {
+    public ArgObj(String obj,String prop) {
         this.obj = obj;
+        this.prop = prop;
     }
 
     public String getObj() {
@@ -13,5 +15,23 @@ public class ArgObj {
 
     public void setObj(String obj) {
         this.obj = obj;
+    }
+
+    public String getProp() {
+        return prop;
+    }
+
+    public void setProp(String prop) {
+        this.prop = prop;
+    }
+
+
+    public String toStringObj() {
+        return  obj;
+    }
+
+
+    public String toStringProp() {
+        return prop;
     }
 }

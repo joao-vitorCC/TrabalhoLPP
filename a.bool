@@ -1,4 +1,18 @@
+   vars x,y,z
 ano = 1993
 ano=2024
 test = 22
+teste = a
+
+    vars a, b, c
+aluno.nome = name
+p.age = x
+s.age = 30
+val = Student.grade
+l = test.fun()
+data = date.getDate(j)
+avg = ALUNO.average(n)
+avg = ALUNO.average(n,ni,nj)
+method Test(x,y,z)
+
 if(){}

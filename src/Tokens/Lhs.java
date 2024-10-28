@@ -11,6 +11,11 @@ public class Lhs {
         return varName;
     }
 
+    @Override
+    public String toString() {
+        return  varName ;
+    }
+
     public void setVarName(String varName) {
         this.varName = varName;
     }

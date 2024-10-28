@@ -1,17 +1,17 @@
 package Tokens;
 
 public class ArgMeth {
-    String method;
+    Method method;
 
-    public ArgMeth(String method) {
+    public ArgMeth(Method method) {
         this.method = method;
     }
 
-    public String getMethod() {
+    public Method getMethod() {
         return method;
     }
 
-    public void setMethod(String method) {
+    public void setMethod(Method method) {
         this.method = method;
     }
 }

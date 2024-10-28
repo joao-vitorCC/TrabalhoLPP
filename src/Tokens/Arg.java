@@ -11,6 +11,11 @@ public class Arg {
         return num;
     }
 
+    @Override
+    public String toString() {
+        return  String.valueOf(num) ;
+    }
+
     public void setNum(int num) {
         this.num = num;
     }
