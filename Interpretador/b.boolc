@@ -1,0 +1,46 @@
+class Base
+ vars id
+ method showid()
+ vars x
+ begin
+ const 50
+ load self
+ set id
+ load self
+ get id
+ store x
+ load x
+ ret
+ end-method
+end-class
+
+class main
+vars a
+vars b
+vars c
+vars p
+const 10
+store a
+load a
+store b
+const 20
+store a
+load b
+load a
+add
+store c
+load c
+load b
+sub
+store c
+load a
+load b
+mul
+store c
+load a
+load b
+div
+store c
+new Base
+store p
+end-class
