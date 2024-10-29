@@ -1,0 +1,48 @@
+class Base
+    vars id
+    method showid()
+    vars x
+    begin
+const 10
+load self
+set id
+load self
+get id
+store x
+const 0
+store x
+load x
+ret
+    end-method
+end-class
+class Pessoa
+    vars num
+    method calc(x)
+    vars y, z
+    begin
+load self
+get num
+store z
+load x
+load z
+add
+store y
+load y
+ret
+    end-method
+end-class
+main()
+vars p,b,x
+begin
+const 111
+load b
+set id
+const 123
+load p
+set num
+const 321
+load p
+set id
+const 1024
+store x
+end

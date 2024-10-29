@@ -11,7 +11,6 @@ public class Run {
         try {
             String DirectoryPath = System.getProperty("user.dir") + "/" + ArquivoEntrada;
             FileReader arq = new FileReader(DirectoryPath);
-            System.out.println(DirectoryPath);
             return arq;
 
         } catch (IOException e) {
@@ -35,31 +34,26 @@ public class Run {
                     Atribuicao at;
                     at = Processing.processAtrr(linha);
                     Processing.saveAtrr(arqS,at);
-                    System.out.println("e atribuicao");
                 }
                 else if(Processing.isAtrrvarvar(linha)){
                     Atribuicao at;
                     at = Processing.processAtrrVarVar(linha);
                     Processing.saveAtrrvarvar(arqS,at);
-                    System.out.println("e atribuicao var var");
                 }
                 else if(Processing.isAtrrObjVar(linha)){
                     Atribuicao at;
                     at = Processing.processAtrrObjVar(linha);
                     Processing.saveAtrrObjVar(arqS,at);
-                    System.out.println("e atribuicao Obj var");
                 }
                 else if(Processing.isAtrrObjConst(linha)){
                     Atribuicao at;
                     at = Processing.processAtrrObjConst(linha);
                     Processing.saveAtrrObjConst(arqS,at);
-                    System.out.println("e atribuicao Obj Const");
                 }
                 else if(Processing.isAtrrVarObj(linha)){
                     Atribuicao at;
                     at = Processing.processAtrrVarObj(linha);
                     Processing.saveAtrrVarObj(arqS,at);
-                    System.out.println("e atribuicao var obj");
                 }
 
                 else if(Processing.isAtrrVarMethod(linha)){
@@ -67,14 +61,12 @@ public class Run {
                     Atribuicao at;
                     at = Processing.processAtrrVarMethod(linha);
                     Processing.saveAtrrVarMethod(arqS,at);
-                    System.out.println("e atribuicao var obj");
                 }
                 else if(Processing.isAtrrVarArgBin(linha)){
                     //System.out.println("metodo");
                     Atribuicao at;
                     at = Processing.processAtrrVarArgBin(linha);
                     Processing.saveAtrrVarArgBin(arqS,at);
-                    System.out.println("e atribuicao var bin");
                 }
                 else if(Processing.isDeclClass(linha)){
                   Processing.saveDeclClass(arqS,linha);
@@ -105,14 +97,13 @@ public class Run {
                     Processing.saveReturn(arqS,arg);
                 }
                 else if(Processing.isIf(linha)){
-                    System.out.println("if");
                     Se se;
                     se = Processing.processIf(linha);
                     String arqSai = ArquivoSaida;
                     Processing.saveIf(arqS,se);
                 }
             }
-            System.out.println(linha);
+
         }
         arqS.close();
         arq.close();
@@ -124,7 +115,6 @@ public class Run {
             String DirectoryPath = System.getProperty("user.dir") + "/" + arquivoSaida;
             File arq = new File(DirectoryPath);
             arq.createNewFile();
-            System.out.print("Arquivo criado com sucesso!");
             return arq;
 
         } catch (IOException e) {

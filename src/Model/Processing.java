@@ -245,18 +245,14 @@ public class Processing {
     public static void saveReturn( BufferedWriter arq,String return1) throws IOException {
         arq.write("load " + return1 + "\n" + "ret");
         arq.newLine();
-        System.out.println("gravado");
     }
 
     public static void saveAtrrVarObj( BufferedWriter arq , Atribuicao at) throws IOException {
-        System.out.println("Gravar no arquivo de saida as instrucoes de atribuicao var = objname.objprop ");
-        arq.write("load " + at.getArgObj().toStringObj() + "\n" + "get " + at.getArgObj().toStringProp()
+       arq.write("load " + at.getArgObj().toStringObj() + "\n" + "get " + at.getArgObj().toStringProp()
                 + "\n" + "store " + at.getLhs().toString());
         arq.newLine();
-        System.out.println("gravado");
     }
     public static void saveAtrrVarMethod( BufferedWriter arq , Atribuicao at) throws IOException {
-        System.out.println("Gravar no arquivo de saida as instrucoes de atribuicao var = objname.objprop() ");
         if(at.getMethod().getArgs() != null){
             for (String var : at.getMethod().getArgs()){
                 arq.write("load " + var);
@@ -270,7 +266,6 @@ public class Processing {
                     + "\n" + "store " + at.getLhs().toString());
         }
         arq.newLine();
-        System.out.println("gravado");
     }
 
     public static void saveIf(BufferedWriter arq , Se se) throws IOException {
@@ -283,7 +278,6 @@ public class Processing {
     public static boolean isAtrr(String text){
         String patternAtribuicao = "\\s*[A-Za-z]+\\s*=\\s*[0-9]+\\s*";
         Pattern pattern = Pattern.compile(patternAtribuicao);
-        System.out.println(Pattern.matches(patternAtribuicao,text));
         boolean b = Pattern.matches(patternAtribuicao,text);
         return b;
     }
@@ -291,7 +285,6 @@ public class Processing {
     public static boolean isAtrrvarvar(String text){
         String patternAtribuicaovarvar = "\\s*[A-Za-z]+\\s*=\\s*[A-Za-z]+\\s*";
         Pattern pattern = Pattern.compile(patternAtribuicaovarvar);
-        System.out.println(Pattern.matches(patternAtribuicaovarvar,text));
         boolean b = Pattern.matches(patternAtribuicaovarvar,text);
         return b;
     }
@@ -299,7 +292,6 @@ public class Processing {
     public static boolean isAtrrObjVar(String text){
         String patternAtribuicaoObjVar = "\\s*[A-Za-z]+\\.[A-Za-z]+\\s*=\\s*[A-Za-z]+\\s*";
         Pattern pattern = Pattern.compile(patternAtribuicaoObjVar);
-        System.out.println(Pattern.matches(patternAtribuicaoObjVar,text));
         boolean b = Pattern.matches(patternAtribuicaoObjVar,text);
         return b;
     }
@@ -307,7 +299,6 @@ public class Processing {
     public static boolean isAtrrObjConst(String text){
         String patternAtribuicaoObjConst = "\\s*[A-Za-z]+\\.[A-Za-z]+\\s*=\\s*[0-9]+\\s*";
         Pattern pattern = Pattern.compile(patternAtribuicaoObjConst);
-        System.out.println(Pattern.matches(patternAtribuicaoObjConst,text));
         boolean b = Pattern.matches(patternAtribuicaoObjConst,text);
         return b;
     }
@@ -315,7 +306,6 @@ public class Processing {
     public static boolean isAtrrVarObj(String text){
         String patternAtribuicaoVarObj = "\\s*[A-Za-z]+\\s*=\\s*[A-Za-z]+\\.[A-Za-z]+\\s*";
         Pattern pattern = Pattern.compile(patternAtribuicaoVarObj);
-        System.out.println(Pattern.matches(patternAtribuicaoVarObj,text));
         boolean b = Pattern.matches(patternAtribuicaoVarObj,text);
         return b;
     }
@@ -323,7 +313,6 @@ public class Processing {
     public static boolean isAtrrVarMethod(String text){
         String patternAtribuicaoVarMethod = "\\s*[A-Za-z]+\\s*=\\s*[A-Za-z]+\\.[A-Za-z]+\\([[A-Za-z]*|[[A-Za-z],]*]*\\)\\s*";
         Pattern pattern = Pattern.compile(patternAtribuicaoVarMethod);
-        System.out.println(Pattern.matches(patternAtribuicaoVarMethod,text));
         boolean b = Pattern.matches(patternAtribuicaoVarMethod,text);
         return b;
     }
@@ -331,7 +320,6 @@ public class Processing {
     public static boolean isAtrrVarArgBin(String text){
         String patternAtribuicaoVarArgBin = "\\s*[A-Za-z]+\\s*=\\s*[A-Za-z]+\\s*[\\+|\\-|\\*|\\/]\\s*[A-Za-z]+\\s*";
         Pattern pattern = Pattern.compile(patternAtribuicaoVarArgBin);
-        System.out.println(Pattern.matches(patternAtribuicaoVarArgBin,text));
         boolean b = Pattern.matches(patternAtribuicaoVarArgBin,text);
         return b;
     }
@@ -339,14 +327,12 @@ public class Processing {
     public static boolean isDeclClass(String text){
         String patternDecClass = "\\s*class\\s[A-Za-z]+\\s*";
         Pattern pattern = Pattern.compile(patternDecClass);
-        System.out.println(Pattern.matches(patternDecClass,text));
         boolean b = Pattern.matches(patternDecClass,text);
         return b;
     }
     public static boolean isDeclVar(String text){
         String patternDeclVar = "\\s*vars\\s[[A-Za-z]+\\s*|[A-Za-z]\\,*\\s*]+\\s*";
         Pattern pattern = Pattern.compile( patternDeclVar);
-        System.out.println(Pattern.matches( patternDeclVar,text));
         boolean b = Pattern.matches( patternDeclVar,text);
         return b;
     }
@@ -354,7 +340,6 @@ public class Processing {
     public static boolean isDeclMethod(String text){
         String patternDeclMethod = "\\s*method\\s[A-Za-z]+\\([\\s*[A-Za-z]*\\s*|\\s*[A-Za-z]\\,*]*\\)";
         Pattern pattern = Pattern.compile(patternDeclMethod);
-        System.out.println(Pattern.matches(patternDeclMethod,text));
         boolean b = Pattern.matches(patternDeclMethod,text);
         return b;
     }
@@ -362,7 +347,6 @@ public class Processing {
     public static boolean isEndMethod(String text){
         String patternEndMethod = "\\s*end-method\\s*";
         Pattern pattern = Pattern.compile(patternEndMethod);
-        System.out.println(Pattern.matches(patternEndMethod,text));
         boolean b = Pattern.matches(patternEndMethod,text);
         return b;
     }
@@ -370,14 +354,12 @@ public class Processing {
     public static boolean isBegin(String text){
         String patternbegin = "\\s*begin\\s*";
         Pattern pattern = Pattern.compile(patternbegin);
-        System.out.println(Pattern.matches(patternbegin,text));
         boolean b = Pattern.matches(patternbegin,text);
         return b;
     }
     public static boolean isEndClass(String text){
         String patternEndClass = "\\s*end-class\\s*";
         Pattern pattern = Pattern.compile(patternEndClass);
-        System.out.println(Pattern.matches(patternEndClass,text));
         boolean b = Pattern.matches(patternEndClass,text);
         return b;
     }
@@ -385,7 +367,6 @@ public class Processing {
     public static boolean isMain(String text){
         String patternMain = "\\s*main\\(\\)\\s*";
         Pattern pattern = Pattern.compile(patternMain);
-        System.out.println(Pattern.matches(patternMain,text));
         boolean b = Pattern.matches(patternMain,text);
         return b;
     }
@@ -393,7 +374,6 @@ public class Processing {
     public static boolean isEnd(String text){
         String patternEnd = "\\s*end\\s*";
         Pattern pattern = Pattern.compile(patternEnd);
-        System.out.println(Pattern.matches(patternEnd,text));
         boolean b = Pattern.matches(patternEnd,text);
         return b;
     }
@@ -401,7 +381,6 @@ public class Processing {
     public static boolean isReturn(String text){
         String patternReturn = "\\s*return\\s*[A-Za-z]+\\s*";
         Pattern pattern = Pattern.compile(patternReturn);
-        System.out.println(Pattern.matches(patternReturn,text));
         boolean b = Pattern.matches(patternReturn,text);
         return b;
     }
@@ -409,7 +388,6 @@ public class Processing {
     public static boolean isIf(String text){
         String patternIf = "\\s*if\\s[A-Za-z]+\\s[A-Za-z]+\\s[A-Za-z]+\\sthen\\s*";
         Pattern pattern = Pattern.compile(patternIf);
-        System.out.println(Pattern.matches(patternIf,text));
         boolean b = Pattern.matches(patternIf,text);
         return b;
     }
