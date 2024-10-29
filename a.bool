@@ -14,5 +14,9 @@ data = date.getDate(j)
 avg = ALUNO.average(n)
 avg = ALUNO.average(n,ni,nj)
 method Test(x,y,z)
-
-if(){}
+a = x +y
+z = r - p
+j = g * t
+h = e / q
+return a
+if arga gt argb then

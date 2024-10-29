@@ -7,6 +7,12 @@ public class Atribuicao {
     private LhsObj lhsObj;
     private  ArgObj argObj;
     private Method method;
+    private ArgBin argBin;
+
+    public Atribuicao(Lhs lhs, ArgBin argBin) {
+        this.lhs = lhs;
+        this.argBin = argBin;
+    }
 
     public Atribuicao(Lhs lhs, Method method) {
         this.lhs = lhs;
@@ -84,5 +90,13 @@ public class Atribuicao {
 
     public void setMethod(Method method) {
         this.method = method;
+    }
+
+    public ArgBin getArgBin() {
+        return argBin;
+    }
+
+    public void setArgBin(ArgBin argBin) {
+        this.argBin = argBin;
     }
 }

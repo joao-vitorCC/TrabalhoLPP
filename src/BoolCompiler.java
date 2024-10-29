@@ -9,7 +9,7 @@ public class  BoolCompiler{
     //Teste
     public static void main(String[] args) throws IOException {
         Scanner sc = new Scanner(System.in);
-        String ArquivoEntrada = "Teste.bool";
+        String ArquivoEntrada = "a.bool";
         String ArquivoSaida = "b.boolc";
 
         /*if(args.length == 2){
@@ -25,18 +25,6 @@ public class  BoolCompiler{
         FileReader arq = Model.Run.openFile(ArquivoEntrada);
         File arqSaida = Model.Run.createFile(ArquivoSaida);
         Model.Run.readFile(arq,ArquivoSaida);
-
-        /*  try {
-            FileReader arq = new FileReader(ArquivoEntrada);
-            BufferedReader lerArq = new BufferedReader(arq);
-
-            arq.close();
-
-        } catch (IOException e) {
-
-            System.out.printf("Erro na abertura do arquivo: %s.\n", e.getMessage());
-
-        }*/
         System.out.println(ArquivoEntrada + " " + ArquivoSaida);
         sc.close();
     }

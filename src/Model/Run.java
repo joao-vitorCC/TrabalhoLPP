@@ -1,6 +1,7 @@
 package Model;
 
 import Tokens.Atribuicao;
+import Tokens.Se;
 
 import java.io.*;
 
@@ -68,6 +69,13 @@ public class Run {
                     Processing.saveAtrrVarMethod(arqS,at);
                     System.out.println("e atribuicao var obj");
                 }
+                else if(Processing.isAtrrVarArgBin(linha)){
+                    //System.out.println("metodo");
+                    Atribuicao at;
+                    at = Processing.processAtrrVarArgBin(linha);
+                    Processing.saveAtrrVarArgBin(arqS,at);
+                    System.out.println("e atribuicao var bin");
+                }
                 else if(Processing.isDeclClass(linha)){
                   Processing.saveDeclClass(arqS,linha);
                 }
@@ -91,6 +99,17 @@ public class Run {
                 }
                 else if(Processing.isEnd(linha)){
                     Processing.saveEnd(arqS,linha);
+                }
+                else if(Processing.isReturn(linha)){
+                    String arg = Processing.processReturn(linha);
+                    Processing.saveReturn(arqS,arg);
+                }
+                else if(Processing.isIf(linha)){
+                    System.out.println("if");
+                    Se se;
+                    se = Processing.processIf(linha);
+                    String arqSai = ArquivoSaida;
+                    Processing.saveIf(arqS,se);
                 }
             }
             System.out.println(linha);
