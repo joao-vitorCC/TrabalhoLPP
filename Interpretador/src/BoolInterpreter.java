@@ -8,17 +8,20 @@ import java.util.Stack;
 
 public class BoolInterpreter {
 
-    private List<Var> variaveis = new ArrayList<>();
+    private final List<Var> variaveis = new ArrayList<>();
     private String classeAtual = null;
     private String metodoAtual = null;
     private boolean aguardandoSet = false;
     private Integer ultimoValor = null;
-    private HashMap<String, Integer> atributosClasse = new HashMap<>();
-    private Integer valorDeRetorno = null;
-    private List<String> linhasMetodo = new ArrayList<>();
-    private Stack<Object> pilhaExecucao = new Stack<>();
-    private HashMap<String, Var> objetosGlobais = new HashMap<>();
+    private final HashMap<String, Integer> atributosClasse = new HashMap<>();
+    private final List<String> linhasMetodo = new ArrayList<>();
+    private final Stack<Object> pilhaExecucao = new Stack<>();
+    public static HashMap<String, Var> objetosGlobais = new HashMap<>();
     boolean aguardandoElse = false;
+    private final HashMap<String, List<String>> classesDeclaradas = new HashMap<>();
+    private final HashMap<String, List<String>> metodos = new HashMap<>();
+    private final ColetorDeLixo coletorDeLixo = new ColetorDeLixo();
+    private int contadorInstrucoes = 0;
 
     public void readFile(String caminhoArquivo) {
         try {
@@ -34,83 +37,20 @@ public class BoolInterpreter {
                     linhasMetodo.add(linha);
                 }
 
+                Integer valorDeRetorno = null;
                 switch (partes[0]) {
-                    case "class":
-                        if (partes.length == 2) {
-                            classeAtual = partes[1];
-                            metodoAtual = null;
-                            atributosClasse.clear();
-                            System.out.println("Classe encontrada: " + classeAtual);
-
-                            Var definicaoClasse = new Var(classeAtual);
-                            objetosGlobais.put(classeAtual, definicaoClasse);
-                        }
-                        break;
-
-                    case "method":
-                        if (classeAtual != null && partes.length == 2) {
-                            metodoAtual = partes[1];
-                            linhasMetodo.clear();
-                            System.out.println("Método encontrado: " + metodoAtual + " na classe " + classeAtual);
-
-                            while ((linha = bufferedReader.readLine()) != null) {
-                                linha = linha.trim();
-                                if (linha.equals("end-method")) {
-                                    System.out.println("Fim do método: " + metodoAtual);
-                                    break;
-                                } else {
-                                    linhasMetodo.add(linha);
-                                }
-                            }
-
-                            Var objetoClasse = encontrarVariavel("obj_" + classeAtual);
-                            if (objetoClasse != null) {
-                                objetoClasse.addMetodo(metodoAtual, new ArrayList<>(linhasMetodo));
-                            } else {
-                                System.out.println("Erro: Não foi possível associar o método à classe '" + classeAtual + "'.");
-                            }
-
-                            metodoAtual = null;
-                        } else {
-                            System.out.println("Erro: Método declarado fora de uma classe.");
-                        }
-                        break;
-
-                    case "end-method":
-
-                        if (metodoAtual != null) {
-                            System.out.println("Fim do método: " + metodoAtual);
-                            metodoAtual = null;
-                        }
-                        break;
-
-                    case "end-class":
-
-                        if (classeAtual != null) {
-                            System.out.println("Fim da classe: " + classeAtual);
-                            classeAtual = null;
-                            atributosClasse.clear();
-                        }
-                        break;
 
                     case "vars":
-
                         if (partes.length == 2) {
                             String nomeVariavel = partes[1];
                             Var novaVar;
 
                             if (metodoAtual != null) {
-
                                 novaVar = new Var(nomeVariavel, classeAtual, metodoAtual);
-                                System.out.println("Variável do método criada: " + nomeVariavel + " na classe " + classeAtual + ", método " + metodoAtual);
                             } else if (classeAtual != null) {
-
                                 novaVar = new Var(nomeVariavel, classeAtual);
-                                System.out.println("Variável da classe criada: " + nomeVariavel + " na classe " + classeAtual);
                             } else {
-
                                 novaVar = new Var(nomeVariavel);
-                                System.out.println("Variável global criada: " + nomeVariavel);
                             }
 
                             variaveis.add(novaVar);
@@ -118,48 +58,44 @@ public class BoolInterpreter {
                         break;
 
                     case "const":
-
                         if (partes.length == 2) {
                             try {
-                                int valorConst = Integer.parseInt(partes[1]);
-                                ultimoValor = valorConst;
-                                System.out.println("Constante armazenada: " + valorConst);
+                                ultimoValor = Integer.parseInt(partes[1]);
                             } catch (NumberFormatException e) {
-                                System.out.println("Erro: Valor constante inválido.");
+                                System.out.println("[ERROR] Valor constante inválido.");
                             }
                         }
                         break;
 
                     case "load":
-
                         if (partes.length == 2) {
                             String nomeParaCarregar = partes[1];
                             if (nomeParaCarregar.equals("self")) {
                                 if (classeAtual != null) {
-
                                     aguardandoSet = true;
                                     pilhaExecucao.push("self");
-                                    System.out.println("Carregando referência de 'self'. Aguardando 'set' ou 'get'.");
                                 } else {
-                                    System.out.println("Erro: 'self' fora de um contexto de classe.");
+                                    System.out.println("[ERROR] 'self' fora de um contexto de classe.");
                                 }
                             } else {
-
                                 Var varEncontrada = encontrarVariavel(nomeParaCarregar);
 
                                 if (varEncontrada != null) {
-                                    Object valorParaEmpilhar = (varEncontrada.getValor() != null) ? varEncontrada.getValor() : varEncontrada;
-                                    pilhaExecucao.push(valorParaEmpilhar);
-                                    System.out.println("Valor da variável/objeto '" + nomeParaCarregar + "' carregado: " + valorParaEmpilhar);
+                                    if (objetosGlobais.containsKey(nomeParaCarregar)) {
+                                        Var objeto = objetosGlobais.get(nomeParaCarregar);
+                                        pilhaExecucao.push(objeto);
+                                    } else {
+                                        Object valorParaEmpilhar = (varEncontrada.getValor() != null) ? varEncontrada.getValor() : varEncontrada;
+                                        pilhaExecucao.push(valorParaEmpilhar);
+                                    }
                                 } else {
-                                    System.out.println("Erro: Variável ou objeto '" + nomeParaCarregar + "' não encontrado.");
+                                    System.out.println("[ERROR] Variável ou objeto '" + nomeParaCarregar + "' não encontrado.");
                                 }
                             }
                         }
                         break;
 
                     case "set":
-
                         if (aguardandoSet && partes.length == 2) {
                             String nomeAtributo = partes[1];
                             aguardandoSet = false;
@@ -168,19 +104,17 @@ public class BoolInterpreter {
                                 pilhaExecucao.pop();
                                 if (ultimoValor != null) {
                                     atributosClasse.put(nomeAtributo, ultimoValor);
-                                    System.out.println("Atributo '" + nomeAtributo + "' da classe '" + classeAtual + "' definido para o valor " + ultimoValor);
                                     ultimoValor = null;
                                 } else {
-                                    System.out.println("Erro: Nenhum valor disponível para definir o atributo.");
+                                    System.out.println("[ERROR] Nenhum valor disponível para definir o atributo.");
                                 }
                             } else {
-                                System.out.println("Erro: 'set' deve ser precedido por 'load self'.");
+                                System.out.println("[ERROR] 'set' deve ser precedido por 'load self'.");
                             }
                         }
                         break;
 
                     case "get":
-
                         if (aguardandoSet && partes.length == 2) {
                             String nomeAtributo = partes[1];
                             aguardandoSet = false;
@@ -190,18 +124,16 @@ public class BoolInterpreter {
                                 if (atributosClasse.containsKey(nomeAtributo)) {
                                     ultimoValor = atributosClasse.get(nomeAtributo);
                                     pilhaExecucao.push(ultimoValor);
-                                    System.out.println("Obtendo valor do atributo '" + nomeAtributo + "' da classe '" + classeAtual + "': " + ultimoValor);
                                 } else {
-                                    System.out.println("Erro: Atributo '" + nomeAtributo + "' não encontrado na classe '" + classeAtual + "'.");
+                                    System.out.println("[ERROR] Atributo '" + nomeAtributo + "' não encontrado na classe '" + classeAtual + "'.");
                                 }
                             } else {
-                                System.out.println("Erro: 'get' deve ser precedido por 'load self'.");
+                                System.out.println("[ERROR] 'get' deve ser precedido por 'load self'.");
                             }
                         }
                         break;
 
                     case "store":
-
                         if (partes.length == 2) {
                             String nomeVariavelStore = partes[1];
                             Var varEncontrada = encontrarVariavel(nomeVariavelStore);
@@ -217,75 +149,23 @@ public class BoolInterpreter {
                                 }
                                 if (valorParaArmazenar != null) {
                                     if (valorParaArmazenar instanceof Integer) {
-
                                         varEncontrada.setValor((Integer) valorParaArmazenar);
-                                        System.out.println("Armazenando valor na variável: " + nomeVariavelStore + " // " + valorParaArmazenar);
-                                    } else if (valorParaArmazenar instanceof Var) {
-
-                                        Var objetoParaArmazenar = (Var) valorParaArmazenar;
+                                    } else if (valorParaArmazenar instanceof Var objetoParaArmazenar) {
                                         objetosGlobais.put(nomeVariavelStore, objetoParaArmazenar);
                                         varEncontrada.setValor(null);
-                                        System.out.println("Armazenando referência ao objeto na variável: " + nomeVariavelStore);
                                     } else {
-                                        System.out.println("Erro: Tipo de valor inválido ao tentar armazenar na variável '" + nomeVariavelStore + "'.");
+                                        System.out.println("[ERROR] Tipo de valor inválido ao tentar armazenar na variável '" + nomeVariavelStore + "'.");
                                     }
                                 } else {
-                                    System.out.println("Erro: Nenhum valor disponível para armazenar.");
+                                    System.out.println("[ERROR] Nenhum valor disponível para armazenar.");
                                 }
                             } else {
-                                System.out.println("Erro: Variável '" + nomeVariavelStore + "' não encontrada para armazenar o valor.");
+                                System.out.println("[ERROR] Variável '" + nomeVariavelStore + "' não encontrada para armazenar o valor.");
                             }
                         } else {
-                            System.out.println("Erro: Nenhuma variável especificada para armazenar o valor.");
+                            System.out.println("[ERROR] Nenhuma variável especificada para armazenar o valor.");
                         }
                         ultimoValor = null;
-                        break;
-
-                    case "new":
-
-                        if (partes.length == 2) {
-                            String nomeClasse = partes[1];
-                            Var novoObjeto = new Var("obj_" + nomeClasse, nomeClasse);
-
-
-                            if ("Base".equals(nomeClasse)) {
-                                List<String> metodoShowId = new ArrayList<>();
-                                metodoShowId.add("const 50");
-                                metodoShowId.add("load self");
-                                metodoShowId.add("set id");
-                                metodoShowId.add("load self");
-                                metodoShowId.add("get id");
-                                metodoShowId.add("store x");
-                                metodoShowId.add("load x");
-                                metodoShowId.add("ret");
-                                novoObjeto.addMetodo("showid", metodoShowId);  // Associa o método "showid" ao objeto Base
-                            }
-
-                            pilhaExecucao.push(novoObjeto);
-                            objetosGlobais.put(novoObjeto.getNome(), novoObjeto);
-                            System.out.println("Novo objeto da classe '" + nomeClasse + "' criado e colocado na pilha.");
-                        }
-                        break;
-
-                    case "ret":
-
-                        if (!linhasMetodo.isEmpty()) {
-                            String linhaAnterior = linhasMetodo.get(linhasMetodo.size() - 1).trim();
-                            String[] partesLinhaAnterior = linhaAnterior.split(" ");
-
-                            if (partesLinhaAnterior[0].equals("load") && partesLinhaAnterior.length == 2) {
-                                String variavelNome = partesLinhaAnterior[1];
-
-
-                                for (Var variavel : variaveis) {
-                                    if (variavel.getNome().equals(variavelNome)) {
-                                        valorDeRetorno = 0;
-                                        System.out.println("Valor de retorno armazenado: " + valorDeRetorno);
-                                        break;
-                                    }
-                                }
-                            }
-                        }
                         break;
 
                     case "add":
@@ -298,9 +178,7 @@ public class BoolInterpreter {
                     case "lt":
                     case "le":
                     case "ne":
-
                         if (pilhaExecucao.size() >= 2) {
-
                             Integer valor1 = (Integer) pilhaExecucao.pop();
                             Integer valor2 = (Integer) pilhaExecucao.pop();
                             Integer resultado = null;
@@ -320,7 +198,7 @@ public class BoolInterpreter {
                                     try {
                                         resultado = Operar.div(valor2, valor1);
                                     } catch (ArithmeticException e) {
-                                        System.out.println("Erro: " + e.getMessage());
+                                        System.out.println("[ERROR] " + e.getMessage());
                                     }
                                     break;
                                 case "eq":
@@ -342,30 +220,25 @@ public class BoolInterpreter {
                                     resultadoBooleano = Operar.ne(valor2, valor1);
                                     break;
                                 default:
-                                    System.out.println("Erro: Operação desconhecida '" + partes[0] + "'.");
+                                    System.out.println("[ERROR] Operação desconhecida '" + partes[0] + "'.");
                                     break;
                             }
 
-
                             if (resultado != null) {
                                 pilhaExecucao.push(resultado);
-                                System.out.println("Resultado da operação '" + partes[0] + "': " + resultado);
                             } else if (resultadoBooleano != null) {
                                 pilhaExecucao.push(resultadoBooleano ? 1 : 0);
-                                System.out.println("Resultado da comparação '" + partes[0] + "': " + (resultadoBooleano ? 1 : 0));
                             }
                         } else {
-                            System.out.println("Erro: Pilha de execução não contém valores suficientes para realizar a operação.");
+                            System.out.println("[ERROR] Pilha de execução não contém valores suficientes para realizar a operação.");
                         }
                         break;
 
                     case "pop":
-
                         if (!pilhaExecucao.isEmpty()) {
-                            Object valorDescartado = pilhaExecucao.pop();
-                            System.out.println("Valor descartado do topo da pilha: " + valorDescartado);
+                            pilhaExecucao.pop();
                         } else {
-                            System.out.println("Erro: Pilha de execução está vazia. Nada para descartar.");
+                            System.out.println("[ERROR] Pilha de execução está vazia. Nada para descartar.");
                         }
                         break;
 
@@ -381,24 +254,23 @@ public class BoolInterpreter {
 
                                         boolean encontrouElse = false;
                                         for (int i = 0; i < linhasASaltar + 1; i++) {
+                                            bufferedReader.mark(1000);
                                             linha = bufferedReader.readLine();
+
                                             if (linha != null && linha.trim().startsWith("else")) {
                                                 encontrouElse = true;
+                                                bufferedReader.reset();
+                                                break;
+                                            }
+
+                                            if (linha == null) {
                                                 break;
                                             }
                                         }
 
-
                                         aguardandoElse = encontrouElse;
 
-                                        if (encontrouElse) {
-                                            System.out.println("Condição 'if' falsa. 'else' encontrado após bloco 'if'.");
-                                        } else {
-                                            System.out.println("Condição 'if' falsa. Não há 'else' após o bloco 'if'.");
-                                        }
                                     } else {
-
-                                        System.out.println("Condição 'if' verdadeira. Executando o bloco 'if'.");
                                         aguardandoElse = false;
                                     }
                                 } else {
@@ -413,15 +285,12 @@ public class BoolInterpreter {
                     case "else":
 
                         if (aguardandoElse) {
-
-                            System.out.println("Bloco 'else' encontrado. Executando o bloco 'else'.");
                             aguardandoElse = false;
                         } else {
 
                             if (partes.length == 2) {
                                 try {
                                     int linhasASaltar = Integer.parseInt(partes[1]);
-                                    System.out.println("Bloco 'else' encontrado, mas o bloco 'if' foi verdadeiro ou não existe. Pulando " + linhasASaltar + " linhas.");
                                     for (int i = 0; i < linhasASaltar; i++) {
                                         bufferedReader.readLine();
                                     }
@@ -432,16 +301,305 @@ public class BoolInterpreter {
                         }
                         break;
 
-                    default:
-                        System.out.println("Instrução desconhecida: " + linha);
+                    case "call":
+                        if (partes.length == 2) {
+                            String nomeMetodo = partes[1];
+                            if (!pilhaExecucao.isEmpty()) {
+                                Object referencia = pilhaExecucao.pop();
+                                if (referencia instanceof Var objeto) {
+                                    List<String> metodoInstrucoes = objeto.getMetodo(nomeMetodo);
+                                    if (metodoInstrucoes != null) {
+                                        Stack<Object> pilhaOriginal = (Stack<Object>) pilhaExecucao.clone();
+                                        Stack<Object> pilhaMetodo = new Stack<>();
+
+                                        while (!pilhaOriginal.isEmpty()) {
+                                            pilhaMetodo.push(pilhaOriginal.pop());
+                                        }
+
+                                        for (String instrucao : metodoInstrucoes) {
+                                            instrucao = instrucao.trim();
+
+                                            String[] partesInstrucao = instrucao.split(" ");
+                                            switch (partesInstrucao[0]) {
+                                                case "begin":
+                                                    break;
+
+                                                case "load":
+                                                    if (partesInstrucao.length == 2) {
+                                                        String nomeParaCarregar = partesInstrucao[1];
+                                                        Var varEncontrada = encontrarVariavel(nomeParaCarregar);
+
+                                                        if (varEncontrada != null) {
+                                                            Object valorParaEmpilhar = (varEncontrada.getValor() != null) ? varEncontrada.getValor() : varEncontrada;
+                                                            pilhaExecucao.push(valorParaEmpilhar);
+                                                        } else {
+                                                            System.out.println("[ERROR] Variável ou objeto '" + nomeParaCarregar + "' não encontrado no método.");
+                                                        }
+                                                    } else {
+                                                        System.out.println("[ERROR] Comando 'load' incorreto durante a execução do método.");
+                                                    }
+                                                    break;
+
+                                                case "store":
+                                                    if (partesInstrucao.length == 2) {
+                                                        String nomeVariavelStore = partesInstrucao[1];
+                                                        Var varEncontrada = encontrarVariavel(nomeVariavelStore);
+                                                        if (varEncontrada != null && !pilhaExecucao.isEmpty()) {
+                                                            int valorParaArmazenar = (Integer) pilhaExecucao.pop();
+                                                            varEncontrada.setValor(valorParaArmazenar);
+                                                        } else {
+                                                            System.out.println("[ERROR] Variável não encontrada ou pilha vazia ao executar 'store'.");
+                                                        }
+                                                    } else {
+                                                        System.out.println("[ERROR] Comando 'store' incorreto durante a execução do método.");
+                                                    }
+                                                    break;
+
+                                                case "add":
+                                                case "sub":
+                                                case "mul":
+                                                case "div":
+                                                case "eq":
+                                                case "gt":
+                                                case "ge":
+                                                case "lt":
+                                                case "le":
+                                                case "ne":
+                                                    if (pilhaExecucao.size() >= 2) {
+                                                        Integer valor1 = (Integer) pilhaExecucao.pop();
+                                                        Integer valor2 = (Integer) pilhaExecucao.pop();
+                                                        Integer resultado = null;
+                                                        Boolean resultadoBooleano = null;
+
+                                                        switch (partesInstrucao[0]) {
+                                                            case "add":
+                                                                resultado = Operar.add(valor2, valor1);
+                                                                break;
+                                                            case "sub":
+                                                                resultado = Operar.sub(valor2, valor1);
+                                                                break;
+                                                            case "mul":
+                                                                resultado = Operar.mul(valor2, valor1);
+                                                                break;
+                                                            case "div":
+                                                                try {
+                                                                    resultado = Operar.div(valor2, valor1);
+                                                                } catch (ArithmeticException e) {
+                                                                    System.out.println("[ERROR] " + e.getMessage());
+                                                                }
+                                                                break;
+                                                            case "eq":
+                                                                resultadoBooleano = Operar.eq(valor2, valor1);
+                                                                break;
+                                                            case "gt":
+                                                                resultadoBooleano = Operar.gt(valor2, valor1);
+                                                                break;
+                                                            case "ge":
+                                                                resultadoBooleano = Operar.ge(valor2, valor1);
+                                                                break;
+                                                            case "lt":
+                                                                resultadoBooleano = Operar.lt(valor2, valor1);
+                                                                break;
+                                                            case "le":
+                                                                resultadoBooleano = Operar.le(valor2, valor1);
+                                                                break;
+                                                            case "ne":
+                                                                resultadoBooleano = Operar.ne(valor2, valor1);
+                                                                break;
+                                                        }
+
+                                                        if (resultado != null) {
+                                                            pilhaExecucao.push(resultado);
+                                                        } else if (resultadoBooleano != null) {
+                                                            pilhaExecucao.push(resultadoBooleano ? 1 : 0);
+                                                        }
+                                                    } else {
+                                                        System.out.println("[ERROR] Pilha de execução não contém valores suficientes para realizar a operação '" + partesInstrucao[0] + "'.");
+                                                    }
+                                                    break;
+
+                                                case "if":
+
+                                                    if (partes.length == 2) {
+                                                        try {
+                                                            int linhasASaltar = Integer.parseInt(partes[1]);
+
+                                                            if (!pilhaExecucao.isEmpty()) {
+                                                                Object valorComparacao = pilhaExecucao.pop();
+                                                                if (valorComparacao instanceof Integer && (Integer) valorComparacao == 0) {
+
+                                                                    boolean encontrouElse = false;
+                                                                    for (int i = 0; i < linhasASaltar + 1; i++) {
+                                                                        bufferedReader.mark(1000);
+                                                                        linha = bufferedReader.readLine();
+
+                                                                        if (linha != null && linha.trim().startsWith("else")) {
+                                                                            encontrouElse = true;
+                                                                            bufferedReader.reset();
+                                                                            break;
+                                                                        }
+
+                                                                        if (linha == null) {
+                                                                            break;
+                                                                        }
+                                                                    }
+
+                                                                    aguardandoElse = encontrouElse;
+
+                                                                } else {
+                                                                    aguardandoElse = false;
+                                                                }
+                                                            } else {
+                                                                System.out.println("Erro: Pilha de execução vazia ao processar 'if'.");
+                                                            }
+                                                        } catch (NumberFormatException e) {
+                                                            System.out.println("Erro: Número de linhas a saltar inválido no 'if'.");
+                                                        }
+                                                    }
+                                                    break;
+
+                                                case "else":
+
+                                                    if (aguardandoElse) {
+                                                        aguardandoElse = false;
+                                                    } else {
+
+                                                        if (partes.length == 2) {
+                                                            try {
+                                                                int linhasASaltar = Integer.parseInt(partes[1]);
+                                                                for (int i = 0; i < linhasASaltar; i++) {
+                                                                    bufferedReader.readLine();
+                                                                }
+                                                            } catch (NumberFormatException e) {
+                                                                System.out.println("Erro: Número de linhas a saltar inválido no 'else'.");
+                                                            }
+                                                        }
+                                                    }
+                                                    break;
+
+                                                case "ret":
+                                                    if (!pilhaExecucao.isEmpty()) {
+                                                        valorDeRetorno = (Integer) pilhaExecucao.pop();
+                                                        pilhaExecucao.push(valorDeRetorno);
+                                                        break;
+                                                    } else {
+                                                        System.out.println("[ERROR] Pilha de execução vazia ao tentar definir o valor de retorno.");
+                                                    }
+                                                    return;
+
+                                                default:
+                                                    System.out.println("[ERROR] Instrução desconhecida dentro do método: " + instrucao);
+                                                    break;
+                                            }
+                                        }
+
+                                    } else {
+                                        System.out.println("[ERROR] Método '" + nomeMetodo + "' não implementado no objeto '" + objeto.getNome() + "'.");
+                                    }
+                                } else {
+                                    System.out.println("[ERROR] Referência no topo da pilha não é válida para chamada de método.");
+                                }
+                            } else {
+                                System.out.println("[ERROR] Pilha de execução vazia ao tentar chamar o método '" + nomeMetodo + "'");
+                            }
+                        } else {
+                            System.out.println("[ERROR] Comando 'call' incorreto.");
+                        }
                         break;
+
+                    case "class":
+                        if (partes.length == 2) {
+                            classeAtual = partes[1];
+                            metodoAtual = null;
+                            atributosClasse.clear();
+                            classesDeclaradas.put(classeAtual, new ArrayList<>());
+                        }
+                        break;
+
+                    case "method":
+                        if (classeAtual != null && partes.length == 2) {
+                            metodoAtual = partes[1];
+                            linhasMetodo.clear();
+                            if (classesDeclaradas.containsKey(classeAtual)) {
+                                classesDeclaradas.get(classeAtual).add(metodoAtual);
+                            } else {
+                                System.out.println("[ERROR] Classe '" + classeAtual + "' não registrada para associar o método.");
+                            }
+                        } else {
+                            System.out.println("[ERROR] Método declarado fora de uma classe ou classe não encontrada.");
+                        }
+                        break;
+
+                    case "end-method":
+                        if (metodoAtual != null) {
+                            if (metodos.containsKey(metodoAtual)) {
+                                metodos.get(metodoAtual).addAll(linhasMetodo);
+                            } else {
+                                metodos.put(metodoAtual, new ArrayList<>(linhasMetodo));
+                            }
+                            metodoAtual = null;
+                        } else {
+                            System.out.println("[ERROR] Nenhum método em execução para encerrar.");
+                        }
+                        break;
+
+                    case "end-class":
+                        if (classeAtual != null) {
+                            classeAtual = null;
+                        }
+                        break;
+
+                    case "new":
+                        if (partes.length == 2) {
+                            String nomeClasse = partes[1];
+                            if (!classesDeclaradas.containsKey(nomeClasse)) {
+                                System.out.println("[ERROR] Classe '" + nomeClasse + "' não encontrada.");
+                                break;
+                            }
+                            Var novoObjeto = new Var("obj_" + nomeClasse, nomeClasse);
+                            List<String> metodosDaClasse = classesDeclaradas.get(nomeClasse);
+                            for (String nomeMetodo : metodosDaClasse) {
+                                if (metodos.containsKey(nomeMetodo)) {
+                                    novoObjeto.addMetodo(nomeMetodo, metodos.get(nomeMetodo));
+                                }
+                            }
+                            pilhaExecucao.push(novoObjeto);
+                            objetosGlobais.put(novoObjeto.getNome(), novoObjeto);
+                        }
+                        break;
+
+                    case "ret":
+                        break;
+
+                    case "begin":
+                        break;
+
+                    case "io.print":
+                        if (!pilhaExecucao.isEmpty()) {
+                            Object valor = pilhaExecucao.peek();
+                            if (valor instanceof Integer) {
+                                System.out.println(valor);
+                            } else {
+                                System.out.println("[ERROR] Valor no topo da pilha não é um número inteiro.");
+                            }
+                        } else {
+                            System.out.println("[ERROR] Pilha de execução vazia. Nada para imprimir.");
+                        }
+                        break;
+
+                    default:
+                        System.out.println("[ERROR] Instrução desconhecida.");
+                }
+                contadorInstrucoes++;
+                if (contadorInstrucoes % 5 == 0) {
+                    coletorDeLixo.executarColeta();
                 }
             }
 
             bufferedReader.close();
             leitor.close();
         } catch (IOException e) {
-            System.out.println("Erro ao ler o arquivo: " + e.getMessage());
+            System.out.println("[ERROR] Erro ao ler o arquivo: " + e.getMessage());
         }
     }
 
@@ -451,6 +609,10 @@ public class BoolInterpreter {
                 return variavel;
             }
         }
+        if (objetosGlobais.containsKey(nome)) {
+            return objetosGlobais.get(nome);
+        }
+        System.out.println("[ERROR] Variável não encontrada: " + nome);
         return null;
     }
 }

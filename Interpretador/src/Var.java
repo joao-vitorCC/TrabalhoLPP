@@ -3,34 +3,30 @@ import java.util.List;
 
 public class Var {
 
-    private String nome;
-    private String classe;
-    private String metodo;
+    private final String nome;
     private Integer valor;
-    private HashMap<String, List<String>> metodos;
+    private final HashMap<String, List<String>> metodos;
+    private String cor;
 
     public Var(String nome) {
         this.nome = nome;
-        this.classe = "main";
-        this.metodo = null;
         this.valor = 0;
         this.metodos = new HashMap<>();
+        this.cor = "cinza";
     }
 
     public Var(String nome, String classe) {
         this.nome = nome;
-        this.classe = classe;
-        this.metodo = null;
         this.valor = 0;
         this.metodos = new HashMap<>();
+        this.cor = "cinza";
     }
 
     public Var(String nome, String classe, String metodo) {
         this.nome = nome;
-        this.classe = classe;
-        this.metodo = metodo;
         this.valor = 0;
         this.metodos = new HashMap<>();
+        this.cor = "cinza";
     }
 
     public void addMetodo(String nomeMetodo, List<String> instrucoes) {
@@ -42,10 +38,8 @@ public class Var {
     }
 
     public String getNome() { return nome; }
-    public String getClasse() { return classe; }
-    public void setClasse(String classe) { this.classe = classe; }
-    public String getMetodo() { return metodo; }
-    public void setMetodo(String metodo) { this.metodo = metodo; }
     public Integer getValor() { return valor; }
     public void setValor(Integer valor) { this.valor = valor; }
+    public String getCor() { return cor; }
+    public void setCor(String cor) { this.cor = cor; }
 }
